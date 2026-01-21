@@ -4,7 +4,7 @@ from rest_framework import generics, status, serializers
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.db.models import Count, Q
-from drf_spectacular.utils import extend_schema, inline_serializer, OpenApiExample
+from drf_spectacular.utils import extend_schema, inline_serializer, OpenApiExample, extend_schema_view
 
 # Create your views here.
 
@@ -12,12 +12,32 @@ class CreateTask(generics.ListCreateAPIView):
     queryset=Task.objects.all()
     serializer_class=TaskSerializer
 
+
+@extend_schema_view(
+
+    put=extend_schema(
+        summary="Update Task",
+        description="fully update the task. status choices - **'pending', 'started', 'done'**"
+    ),
+
+    patch=extend_schema(
+        summary="Update a specific Task field or all fields by Id",
+        description="status choices - **'pending', 'started', 'done'**"
+    ),
+)
+
 class UpdateTaskStatus(generics.UpdateAPIView):
     queryset=Task.objects.all()
     serializer_class=TaskSerializer
     lookup_field='pk'
     
 
+@extend_schema_view(
+    delete=extend_schema(
+        summary="Delete Task by Id",
+        description="This action is irreversible."
+    ),
+)
 class DestroyTask(generics.DestroyAPIView):
     queryset=Task.objects.all()
     serializer_class=TaskSerializer
