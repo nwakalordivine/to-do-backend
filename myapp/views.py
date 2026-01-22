@@ -35,7 +35,22 @@ class UpdateTaskStatus(generics.UpdateAPIView):
 @extend_schema_view(
     delete=extend_schema(
         summary="Delete Task by Id",
-        description="This action is irreversible."
+        description="This action is irreversible.",
+        responses={
+            200: inline_serializer(
+                name='TaskDelResponse',
+                fields={"message": serializers.CharField()}
+            )
+        },
+        examples=[
+            OpenApiExample(
+                'Valid Example',
+                summary='Delete task',
+                description='Deletes an existing task specified by id.',
+                value={"message": "Task successfully deleted."},
+                response_only=True
+            )
+        ]
     ),
 )
 class DestroyTask(generics.DestroyAPIView):
@@ -43,6 +58,14 @@ class DestroyTask(generics.DestroyAPIView):
     serializer_class=TaskSerializer
     lookup_field='pk'
 
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        
+        return Response(
+            {"message": "Task successfully deleted."},
+            status=status.HTTP_200_OK
+        )
 
 class NumberOfTask(APIView):
 
